@@ -1,17 +1,12 @@
 #root {
   max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
   text-align: center;
     height: 100%;
     width: 100%;
 }
 body {
-    display: flex;
-    align-items: center !important;
-    justify-content: center !important;
-    background-image: url("/background.jpg");
-    background-size: cover;
+    /*background-image: url("/background.jpg");*/
+    /*background-size: cover;*/
 }
 
 .logo {
@@ -52,6 +47,8 @@ body {
 
 
 .container {
+    width: 80%;
+    height: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -59,6 +56,7 @@ body {
     background: #00000099;
     border-radius: 15px;
     padding: 25px;
+    z-index: 2;
 }
 
 .buttons {
@@ -74,13 +72,29 @@ body {
     justify-content: center;
 }
 
-.video {
+.changeBackground {
+    margin-top: 20px;
+    display: flex;
+}
+
+.littleTime {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    opacity: 0.5;
-    z-index: -1;
+    border-radius: 15px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: #000000BB;
+    width: 70%;
+}
+
+.background {
+    width: 100vw;
+    height: 100vh;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

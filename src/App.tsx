@@ -1,10 +1,15 @@
 import {useState, useEffect} from 'react'
 import './App.css'
 
+const POPUP_INIT = {little: false, end: false}
+
 export default function Home() {
     const [timer, setTimer] = useState(60) // Состояние для хранения времени таймера
     const [subHeader, setSubHeader] = useState('test')
-    const [videoPlay, setVideoPlay] = useState(false)
+    const [popUpClosed, setPopupClosed] = useState(POPUP_INIT)
+    const [littleTime, setLittleTime] = useState(false)
+    const [endTimePopup, setEndTime] = useState(false)
+    const [background, setBackground] = useState('/background.jpg')
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
@@ -20,6 +25,10 @@ export default function Home() {
                 setTimer(data.value) // Обновляем состояние таймера
             } else if (data.type === 'subHeader') {
                 setSubHeader(data.value)
+            } else if (data.type === 'start') {
+                setPopupClosed(POPUP_INIT)
+            } else if (data.type === 'background') {
+                setBackground(data.value)
             }
         }
 
@@ -35,29 +44,54 @@ export default function Home() {
 
 
     useEffect(() => {
-        if (timer === 0) {
-            setVideoPlay(true)
-            const video: HTMLVideoElement = document.getElementById('video')
-            video?.play()
+        if (timer === 0 && !popUpClosed.end) {
+            setEndTime(true)
+            return
         }
-    }, [timer])
+        if (timer === 300 && !popUpClosed.little) {
+            setLittleTime(true)
+        }
+
+
+    }, [timer, popUpClosed])
+
+    useEffect(() => {
+        if (endTimePopup) {
+            const video: HTMLElement | null = document.getElementById('video')
+            if (null !== video && video.tagName === 'VIDEO')
+            (video as HTMLVideoElement).play()
+        }
+    }, [endTimePopup])
 
     return (
-        <div className={'container'}>
-            <video id={'video'} hidden={!videoPlay} className={'video'} src={'/cat.mp4'} loop autoPlay={videoPlay}/>
-            <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
-            <div className={'subheadcontainer'}>
-                <span style={{fontSize: '40px'}}>{subHeader}</span>
+        <>
+            <div className={'background'} style={{backgroundImage: `url("${background}")`}}>
+                <div className={'container'}>
+                    {littleTime && <div className={'littleTime'}>
+                        <img alt={'Кот агрессивно печатает'} src={'/cat-computer.gif'}/>
+                        <span style={{fontSize: '24px'}}>Осталось 5 минут</span>
+                        <button onClick={() => {
+                            setLittleTime(false)
+                            setPopupClosed(prevState => ({...prevState, little: true}))
+                        }}>Закрыть уведомление</button>
+                    </div>}
+                    {endTimePopup && <div className={'littleTime'}>
+                        <video id={'video'} src={'/cat.mp4'} loop
+                               autoPlay style={{width: '100%'}}/>
+                        <span style={{fontSize: '24px'}}>Время вышло!</span>
+                        <button onClick={() => {
+                            setEndTime(false)
+                            setPopupClosed(prevState => ({...prevState, end: true}))
+                        }}>Закрыть</button>
+                    </div>}
+                    <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
+                    <div className={'subheadcontainer'}>
+                        <span style={{fontSize: '40px'}}>{subHeader}</span>
+                    </div>
+                    <h1 style={{fontSize: '172px'}}>{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
+                </div>
             </div>
-            <h1 style={{fontSize: '172px'}}>{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
-            <div className={'buttons'}>
-                <button onClick={() => {
-                    const video: HTMLVideoElement = document.getElementById('video')
-                    video?.pause()
-                    setVideoPlay(false)
-                }}>Выключить звук
-                </button>
-            </div>
-        </div>
+        </>
+
     )
 }
