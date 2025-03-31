@@ -7,7 +7,6 @@ export default function Admin() {
     const [minutes, setMinutes] = useState(1);
     const [seconds, setSeconds] = useState(0);
     const [subHeader, setSubHeader] = useState('test');
-    const [videoPlay, setVideoPlay] = useState(false)
     const [editing, setEditing] = useState(false);
     const [ws, setWs] = useState(null);
 
@@ -82,17 +81,8 @@ export default function Admin() {
         }
     }
 
-    useEffect(() => {
-        if (timer === 0) {
-            setVideoPlay(true)
-            const video: HTMLVideoElement = document.getElementById('video')
-            video?.play()
-        }
-    },[timer])
-
     return (
         <div className={'container'}>
-            <video id={'video'} hidden={!videoPlay} className={'video'} src={'/cat.mp4'} loop autoPlay={videoPlay}/>
             <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
             <div className={'subheadcontainer'}>
                 {editing ?
@@ -166,11 +156,6 @@ export default function Admin() {
             <div style={{marginTop: '20px'}}>
                 <button onClick={pauseTimer}>Пауза</button>
                 <button onClick={resumeTimer}>Запустить</button>
-                <button onClick={() => {
-                    const video: HTMLVideoElement = document.getElementById('video')
-                    video?.pause()
-                    setVideoPlay(false)
-                }}>Выключить звук</button>
             </div>
         </div>
     );
