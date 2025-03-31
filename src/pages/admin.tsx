@@ -13,7 +13,7 @@ export default function Admin() {
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
-        const websocket = new WebSocket(`ws://${location.hostname}:8080`);
+        const websocket = new WebSocket(`ws://${location.hostname}:8081`);
 
         websocket.onopen = () => {
             console.log('Подключено к WebSocket-серверу');

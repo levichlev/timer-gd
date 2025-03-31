@@ -8,7 +8,7 @@ export default function Home() {
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
-        const websocket = new WebSocket(`ws://${location.hostname}:8080`)
+        const websocket = new WebSocket(`ws://${location.hostname}:8081`)
 
         websocket.onopen = () => {
             console.log('Подключено к WebSocket-серверу')
@@ -45,7 +45,7 @@ export default function Home() {
     return (
         <div className={'container'}>
             <video id={'video'} hidden={!videoPlay} className={'video'} src={'/cat.mp4'} loop autoPlay={videoPlay}/>
-            <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
+            <span style={{fontSize: '40px'}}>Компетенция "Аналитический контроль"</span>
             <div className={'subheadcontainer'}>
                 <span style={{fontSize: '40px'}}>{subHeader}</span>
             </div>

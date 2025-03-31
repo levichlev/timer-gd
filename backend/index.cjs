@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 
 // Создаем WebSocket-сервер
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 8081 });
 
 let timer = 60; // Начальное значение таймера (в секундах)
 let interval;
