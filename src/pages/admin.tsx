@@ -63,7 +63,8 @@ export default function Admin() {
     return (
         <div className={'background'} style={{backgroundImage: `url("${background}")`}}>
             <div className={'container'}>
-                <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
+                {/* <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span> */}
+                <span className="admin-title">Компетенция "Графический дизайн"</span>
                 <div className={'subheadcontainer'}>
                     {editing ?
                         <>
@@ -79,7 +80,8 @@ export default function Admin() {
 
                         </>
                         : <>
-                            <span style={{fontSize: '40px'}}>{subHeader}</span>
+                            {/* <span style={{fontSize: '40px'}}>{subHeader}</span> */}
+                            {!editing && <span className="admin-subheader">{subHeader}</span>}
                             <svg onClick={() => setEditing(true)} width="25" height="25" viewBox="0 0 25 25" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -90,39 +92,26 @@ export default function Admin() {
 
                     }
                 </div>
-                <h1 style={{fontSize: '172px'}}>{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
-                <div className={'buttons'}>
-                    <div>
-                        <label>Часы:</label>
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            <button onClick={() => setHours((prev) => prev + 1)}>▲</button>
-                            <span>{hours}</span>
-                            <button onClick={() => setHours((prev) => Math.max(prev - 1, 0))}>▼</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label>Минуты:</label>
-                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                            <button onClick={() => setMinutes((prev) => prev + 1)}>▲</button>
-                            <span>{minutes}</span>
-                            <button onClick={() => setMinutes((prev) => Math.max(prev - 1, 0))}>▼</button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label>Секунды:</label>
-                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                            <button onClick={() => setSeconds((prev) => prev + 1)}>▲</button>
-                            <span>{seconds}</span>
-                            <button onClick={() => setSeconds((prev) => Math.max(prev - 1, 0))}>▼</button>
-                        </div>
-                    </div>
+                <h1 className="admin-timer">{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
+                <div className="time-selectors">
+                <div className="time-selector">
+                    <label>Часы:</label>
+                    <button onClick={() => setHours(prev => prev + 1)}>▲</button>
+                    <span>{hours}</span>
+                    <button onClick={() => setHours(prev => Math.max(prev - 1, 0))}>▼</button>
+                </div>
+                <div className="time-selector">
+                    <label>Минуты:</label>
+                    <button onClick={() => setMinutes(prev => prev + 1)}>▲</button>
+                    <span>{minutes}</span>
+                    <button onClick={() => setMinutes(prev => Math.max(prev - 1, 0))}>▼</button>
+                </div>
+                <div className="time-selector">
+                    <label>Секунды:</label>
+                    <button onClick={() => setSeconds(prev => prev + 1)}>▲</button>
+                    <span>{seconds}</span>
+                    <button onClick={() => setSeconds(prev => Math.max(prev - 1, 0))}>▼</button>
+                </div>
                 </div>
 
 
@@ -133,11 +122,11 @@ export default function Admin() {
                     Задать время
                 </button>
 
-                <div style={{marginTop: '20px'}}>
+                <div className="action-buttons">
                     <button onClick={() => sendMessage('pause')}>Пауза</button>
                     <button onClick={() => sendMessage('resume')}>Запустить</button>
                 </div>
-                <div className={'changeBackground'}>
+                <div className="change-background">
                     <input value={background} onChange={({target}) => setBackground(target.value)}/>
                     <button onClick={() => sendMessage('background', background)}>Поменять фон</button>
                 </div>
