@@ -8,7 +8,7 @@ export default function Admin() {
     const [seconds, setSeconds] = useState(0);
     const [subHeader, setSubHeader] = useState('test');
     const [editing, setEditing] = useState(false);
-    const [background, setBackground] = useState('/background.jpg')
+    const [background, setBackground] = useState('/image.gif');
     const [ws, setWs] = useState<WebSocket | null>(null);
 
     useEffect(() => {

@@ -7,7 +7,7 @@ let timer = 60; // Начальное значение таймера (в сек
 let interval;
 let isPaused = false;
 let subHeader = ''
-let background = '/background.jpg'
+let background = '/image.gif'
 
 // Функция для запуска таймера
 function startTimer() {
