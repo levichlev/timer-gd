@@ -9,7 +9,7 @@ export default function Home() {
     const [popUpClosed, setPopupClosed] = useState(POPUP_INIT)
     const [littleTime, setLittleTime] = useState(false)
     const [endTimePopup, setEndTime] = useState(false)
-    const [background, setBackground] = useState('/background.jpg')
+    const [background, setBackground] = useState('/image.gif')
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
