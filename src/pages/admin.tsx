@@ -10,6 +10,7 @@ export default function Admin() {
     const [editing, setEditing] = useState(false);
     const [background, setBackground] = useState('/image.gif');
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
@@ -21,11 +22,19 @@ export default function Admin() {
 
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             if (data.type === 'timer') {
-                setTimer(data.value); // Обновляем состояние таймера
+                setTimer(data.value);
             } else if (data.type === 'subHeader') {
-                setSubHeader(data.value)
+                setSubHeader(data.value);
+            } else if (data.type === 'status') {
+                setIsRunning(!data.value);
             }
+            // if (data.type === 'timer') {
+            //     setTimer(data.value); // Обновляем состояние таймера
+            // } else if (data.type === 'subHeader') {
+            //     setSubHeader(data.value)
+            // }
         };
 
         websocket.onclose = () => {
@@ -94,24 +103,24 @@ export default function Admin() {
                 </div>
                 <h1 className="admin-timer">{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
                 <div className="time-selectors">
-                <div className="time-selector">
-                    <label>Часы:</label>
-                    <button onClick={() => setHours(prev => prev + 1)}>▲</button>
-                    <span>{hours}</span>
-                    <button onClick={() => setHours(prev => Math.max(prev - 1, 0))}>▼</button>
-                </div>
-                <div className="time-selector">
-                    <label>Минуты:</label>
-                    <button onClick={() => setMinutes(prev => prev + 1)}>▲</button>
-                    <span>{minutes}</span>
-                    <button onClick={() => setMinutes(prev => Math.max(prev - 1, 0))}>▼</button>
-                </div>
-                <div className="time-selector">
-                    <label>Секунды:</label>
-                    <button onClick={() => setSeconds(prev => prev + 1)}>▲</button>
-                    <span>{seconds}</span>
-                    <button onClick={() => setSeconds(prev => Math.max(prev - 1, 0))}>▼</button>
-                </div>
+                    <div className="time-selector">
+                        <label>Часы:</label>
+                        <button onClick={() => setHours(prev => prev + 1)}>▲</button>
+                        <span>{hours}</span>
+                        <button onClick={() => setHours(prev => Math.max(prev - 1, 0))}>▼</button>
+                    </div>
+                    <div className="time-selector">
+                        <label>Минуты:</label>
+                        <button onClick={() => setMinutes(prev => prev + 1)}>▲</button>
+                        <span>{minutes}</span>
+                        <button onClick={() => setMinutes(prev => Math.max(prev - 1, 0))}>▼</button>
+                    </div>
+                    <div className="time-selector">
+                        <label>Секунды:</label>
+                        <button onClick={() => setSeconds(prev => prev + 1)}>▲</button>
+                        <span>{seconds}</span>
+                        <button onClick={() => setSeconds(prev => Math.max(prev - 1, 0))}>▼</button>
+                    </div>
                 </div>
 
 
@@ -122,10 +131,15 @@ export default function Admin() {
                     Задать время
                 </button>
 
-                <div className="action-buttons">
+                {/* <div className="action-buttons">
                     <button onClick={() => sendMessage('pause')}>Пауза</button>
                     <button onClick={() => sendMessage('resume')}>Запустить</button>
-                </div>
+                </div> */}
+                <button onClick={() => {
+                    sendMessage(isRunning ? 'pause' : 'resume');
+                }}> 
+                {isRunning ? 'Пауза' : 'Запустить'}
+                </button>
                 <div className="change-background">
                     <input value={background} onChange={({target}) => setBackground(target.value)}/>
                     <button onClick={() => sendMessage('background', background)}>Поменять фон</button>
