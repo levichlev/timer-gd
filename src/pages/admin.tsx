@@ -8,8 +8,9 @@ export default function Admin() {
     const [seconds, setSeconds] = useState(0);
     const [subHeader, setSubHeader] = useState('test');
     const [editing, setEditing] = useState(false);
-    const [background, setBackground] = useState('/background.jpg')
+    const [background, setBackground] = useState('/image.gif');
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
@@ -21,11 +22,19 @@ export default function Admin() {
 
         websocket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+            console.log(data);
             if (data.type === 'timer') {
-                setTimer(data.value); // Обновляем состояние таймера
+                setTimer(data.value);
             } else if (data.type === 'subHeader') {
-                setSubHeader(data.value)
+                setSubHeader(data.value);
+            } else if (data.type === 'status') {
+                setIsRunning(!data.value);
             }
+            // if (data.type === 'timer') {
+            //     setTimer(data.value); // Обновляем состояние таймера
+            // } else if (data.type === 'subHeader') {
+            //     setSubHeader(data.value)
+            // }
         };
 
         websocket.onclose = () => {
@@ -63,7 +72,8 @@ export default function Admin() {
     return (
         <div className={'background'} style={{backgroundImage: `url("${background}")`}}>
             <div className={'container'}>
-                <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
+                {/* <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span> */}
+                <span className="admin-title">Компетенция "Графический дизайн"</span>
                 <div className={'subheadcontainer'}>
                     {editing ?
                         <>
@@ -79,7 +89,8 @@ export default function Admin() {
 
                         </>
                         : <>
-                            <span style={{fontSize: '40px'}}>{subHeader}</span>
+                            {/* <span style={{fontSize: '40px'}}>{subHeader}</span> */}
+                            {!editing && <span className="admin-subheader">{subHeader}</span>}
                             <svg onClick={() => setEditing(true)} width="25" height="25" viewBox="0 0 25 25" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path
@@ -90,38 +101,25 @@ export default function Admin() {
 
                     }
                 </div>
-                <h1 style={{fontSize: '172px'}}>{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
-                <div className={'buttons'}>
-                    <div>
+                <h1 className="admin-timer">{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
+                <div className="time-selectors">
+                    <div className="time-selector">
                         <label>Часы:</label>
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}>
-                            <button onClick={() => setHours((prev) => prev + 1)}>▲</button>
-                            <span>{hours}</span>
-                            <button onClick={() => setHours((prev) => Math.max(prev - 1, 0))}>▼</button>
-                        </div>
+                        <button onClick={() => setHours(prev => prev + 1)}>▲</button>
+                        <span>{hours}</span>
+                        <button onClick={() => setHours(prev => Math.max(prev - 1, 0))}>▼</button>
                     </div>
-
-                    <div>
+                    <div className="time-selector">
                         <label>Минуты:</label>
-                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                            <button onClick={() => setMinutes((prev) => prev + 1)}>▲</button>
-                            <span>{minutes}</span>
-                            <button onClick={() => setMinutes((prev) => Math.max(prev - 1, 0))}>▼</button>
-                        </div>
+                        <button onClick={() => setMinutes(prev => prev + 1)}>▲</button>
+                        <span>{minutes}</span>
+                        <button onClick={() => setMinutes(prev => Math.max(prev - 1, 0))}>▼</button>
                     </div>
-
-                    <div>
+                    <div className="time-selector">
                         <label>Секунды:</label>
-                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                            <button onClick={() => setSeconds((prev) => prev + 1)}>▲</button>
-                            <span>{seconds}</span>
-                            <button onClick={() => setSeconds((prev) => Math.max(prev - 1, 0))}>▼</button>
-                        </div>
+                        <button onClick={() => setSeconds(prev => prev + 1)}>▲</button>
+                        <span>{seconds}</span>
+                        <button onClick={() => setSeconds(prev => Math.max(prev - 1, 0))}>▼</button>
                     </div>
                 </div>
 
@@ -133,11 +131,16 @@ export default function Admin() {
                     Задать время
                 </button>
 
-                <div style={{marginTop: '20px'}}>
+                {/* <div className="action-buttons">
                     <button onClick={() => sendMessage('pause')}>Пауза</button>
                     <button onClick={() => sendMessage('resume')}>Запустить</button>
-                </div>
-                <div className={'changeBackground'}>
+                </div> */}
+                <button onClick={() => {
+                    sendMessage(isRunning ? 'pause' : 'resume');
+                }}> 
+                {isRunning ? 'Пауза' : 'Запустить'}
+                </button>
+                <div className="change-background">
                     <input value={background} onChange={({target}) => setBackground(target.value)}/>
                     <button onClick={() => sendMessage('background', background)}>Поменять фон</button>
                 </div>

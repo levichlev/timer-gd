@@ -1,92 +1,115 @@
 const WebSocket = require('ws');
 
-// Создаем WebSocket-сервер
 const wss = new WebSocket.Server({ port: 8080 });
 
-let timer = 60; // Начальное значение таймера (в секундах)
-let interval;
-let isPaused = false;
-let subHeader = ''
-let background = '/background.jpg'
+let timer = 60;
+let interval = null;
+let isPaused = true;        // таймер на паузе
+let subHeader = '';
+let background = '/image.gif';
 
-// Функция для запуска таймера
 function startTimer() {
-    if (!interval && !isPaused) {
-        broadcastMessage('start', timer);
-        interval = setInterval(() => {
-            if (timer > 0) {
-                timer--;
-                broadcastMessage('timer', timer);
-            } else {
+    if (interval) clearInterval(interval);
+    interval = null;
+    if (isPaused) return;
+    if (timer <= 0) return;
+
+    interval = setInterval(() => {
+        if (timer > 0 && !isPaused) {
+            timer--;
+            broadcastMessage('timer', timer);
+            if (timer === 0) {
                 clearInterval(interval);
                 interval = null;
+                isPaused = false;
+                broadcastMessage('status', false);
             }
-        }, 1000);
-    }
+        } else if (timer === 0) {
+            clearInterval(interval);
+            interval = null;
+        }
+    }, 1000);
 }
 
-// функция для отправки сообщения всем клиентам
-const broadcastMessage = (type, value) => {
+function broadcastMessage(type, value) {
     const message = JSON.stringify({ type, value });
     wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(message);
-            console.log('Отправлена рассылка:', message)
         }
     });
+    console.log(`Broadcast: ${message}`);
 }
 
-
-// Обработка подключений
 wss.on('connection', (ws) => {
-    console.log('Новый клиент подключен');
+    console.log('Клиент подключён');
 
-    // Отправляем текущее значение таймера новому клиенту
     ws.send(JSON.stringify({ type: 'timer', value: timer }));
     ws.send(JSON.stringify({ type: 'subHeader', value: subHeader }));
     ws.send(JSON.stringify({ type: 'background', value: background }));
+    ws.send(JSON.stringify({ type: 'status', value: isPaused }));
 
-    // Запускаем таймер, если он еще не запущен и не на паузе
-    if (!interval && !isPaused) {
+    if (!isPaused && timer > 0 && !interval) {
         startTimer();
     }
 
-    // Обработка сообщений от клиента
     ws.on('message', (message) => {
         const data = JSON.parse(message);
-        console.log('Получено сообщение:', data)
+        console.log('Получено:', data);
 
-        if (data.type === 'setTimer') {
-            const { hours, minutes, seconds } = data;
-            timer = hours * 3600 + minutes * 60 + seconds;
-            broadcastMessage('timer', timer); // Рассылаем новое значение таймера всем клиентам
-        } else if (data.type === 'pause') {
-            isPaused = true;
-            clearInterval(interval);
-            interval = null;
-        } else if (data.type === 'resume') {
-            isPaused = false;
-            startTimer();
-            broadcastMessage('start', timer);
-        } else if (data.type === 'stop') {
-            isPaused = false;
-            clearInterval(interval);
-            interval = null;
-            timer = 0;
-            broadcastMessage('timer', timer);
-        } else if (data.type === 'subHeader') {
-            subHeader = data.value
-            broadcastMessage('subHeader', subHeader)
-        } else if (data.type === 'background') {
-            background = data.value
-            broadcastMessage('background', background)
+        switch (data.type) {
+            case 'setTimer': {
+                const { hours, minutes, seconds } = data;
+                const newTimer = hours * 3600 + minutes * 60 + seconds;
+                if (interval) {
+                    clearInterval(interval);
+                    interval = null;
+                }
+                timer = newTimer;
+                isPaused = true;   // не запускать автоматически
+                broadcastMessage('timer', timer);
+                broadcastMessage('status', true);
+                break;
+            }
+            case 'pause':
+                if (!isPaused && interval) {
+                    isPaused = true;
+                    clearInterval(interval);
+                    interval = null;
+                    broadcastMessage('status', true);
+                }
+                break;
+            case 'resume':
+                if (isPaused && timer > 0) {
+                    isPaused = false;
+                    broadcastMessage('status', false);
+                    startTimer();
+                }
+                break;
+            case 'stop':
+                if (interval) {
+                    clearInterval(interval);
+                    interval = null;
+                }
+                timer = 0;
+                isPaused = false;
+                broadcastMessage('timer', 0);
+                broadcastMessage('status', false);
+                break;
+            case 'subHeader':
+                subHeader = data.value;
+                broadcastMessage('subHeader', subHeader);
+                break;
+            case 'background':
+                background = data.value;
+                broadcastMessage('background', background);
+                break;
+            default:
+                console.log('Неизвестный тип события:', data.type);
         }
     });
 
-    // Обработка отключения клиента
-    ws.on('close', () => {
-        console.log('Клиент отключен');
-    });
+    ws.on('close', () => console.log('Клиент отключён'));
 });
 
 console.log('WebSocket-сервер запущен на порту 8080');

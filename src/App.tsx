@@ -9,7 +9,7 @@ export default function Home() {
     const [popUpClosed, setPopupClosed] = useState(POPUP_INIT)
     const [littleTime, setLittleTime] = useState(false)
     const [endTimePopup, setEndTime] = useState(false)
-    const [background, setBackground] = useState('/background.jpg')
+    const [background, setBackground] = useState('/image.gif')
 
     useEffect(() => {
         // Подключение к WebSocket-серверу
@@ -69,7 +69,8 @@ export default function Home() {
                 <div className={'container'}>
                     {littleTime && <div className={'littleTime'}>
                         <img alt={'Кот агрессивно печатает'} src={'/cat-computer.gif'}/>
-                        <span style={{fontSize: '24px'}}>Осталось 5 минут</span>
+                        {/* <span style={{fontSize: '24px'}}>Осталось 5 минут</span> */}
+                        <span className="popup-text">Осталось 5 минут</span>
                         <button onClick={() => {
                             setLittleTime(false)
                             setPopupClosed(prevState => ({...prevState, little: true}))
@@ -78,17 +79,21 @@ export default function Home() {
                     {endTimePopup && <div className={'littleTime'}>
                         <video id={'video'} src={'/cat.mp4'} loop
                                autoPlay style={{width: '100%'}}/>
-                        <span style={{fontSize: '24px'}}>Время вышло!</span>
+                        {/* <span style={{fontSize: '24px'}}>Время вышло!</span> */}
+                        <span className="popup-text">Время вышло!</span>
                         <button onClick={() => {
                             setEndTime(false)
                             setPopupClosed(prevState => ({...prevState, end: true}))
                         }}>Закрыть</button>
                     </div>}
-                    <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span>
+                    {/* <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span> */}
+                    <span className="title">Компетенция "Графический дизайн"</span>
                     <div className={'subheadcontainer'}>
-                        <span style={{fontSize: '40px'}}>{subHeader}</span>
+                        {/* <span style={{fontSize: '40px'}}>{subHeader}</span> */}
+                        <span className="subheader">{subHeader}</span>
                     </div>
-                    <h1 style={{fontSize: '172px'}}>{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
+                    {/* <h1 style={{fontSize: '172px'}}>{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1> */}
+                    <h1 className="timer">{Math.floor(timer / 3600)}:{Math.floor((timer % 3600) / 60).toString().padStart(2, '0')}:{(timer % 60).toString().padStart(2, '0')}</h1>
                 </div>
             </div>
         </>
