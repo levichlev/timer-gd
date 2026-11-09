@@ -5,6 +5,7 @@ const wss = new WebSocket.Server({ port: 8080 });
 let timer = 60;
 let interval = null;
 let isPaused = true;        // таймер на паузе
+let title = 'Компетенция "Графический дизайн"';
 let subHeader = '';
 let background = '/image.gif';
 
@@ -45,6 +46,7 @@ wss.on('connection', (ws) => {
     console.log('Клиент подключён');
 
     ws.send(JSON.stringify({ type: 'timer', value: timer }));
+    ws.send(JSON.stringify({ type: 'title', value: title }));
     ws.send(JSON.stringify({ type: 'subHeader', value: subHeader }));
     ws.send(JSON.stringify({ type: 'background', value: background }));
     ws.send(JSON.stringify({ type: 'status', value: isPaused }));
@@ -95,6 +97,10 @@ wss.on('connection', (ws) => {
                 isPaused = false;
                 broadcastMessage('timer', 0);
                 broadcastMessage('status', false);
+                break;
+            case 'title':
+                title = data.value;
+                broadcastMessage('title', title);
                 break;
             case 'subHeader':
                 subHeader = data.value;

@@ -5,6 +5,7 @@ const POPUP_INIT = {little: false, end: false}
 
 export default function Home() {
     const [timer, setTimer] = useState(60) // Состояние для хранения времени таймера
+    const [title, setTitle] = useState('Компетенция "Графический дизайн"')
     const [subHeader, setSubHeader] = useState('test')
     const [popUpClosed, setPopupClosed] = useState(POPUP_INIT)
     const [littleTime, setLittleTime] = useState(false)
@@ -23,6 +24,8 @@ export default function Home() {
             const data = JSON.parse(event.data)
             if (data.type === 'timer') {
                 setTimer(data.value) // Обновляем состояние таймера
+            } else if (data.type === 'title') {
+                setTitle(data.value)
             } else if (data.type === 'subHeader') {
                 setSubHeader(data.value)
             } else if (data.type === 'start') {
@@ -87,7 +90,7 @@ export default function Home() {
                         }}>Закрыть</button>
                     </div>}
                     {/* <span style={{fontSize: '40px'}}>Компетенция "Графический дизайн"</span> */}
-                    <span className="title">Компетенция "Графический дизайн"</span>
+                    <span className="title">{title}</span>
                     <div className={'subheadcontainer'}>
                         {/* <span style={{fontSize: '40px'}}>{subHeader}</span> */}
                         <span className="subheader">{subHeader}</span>

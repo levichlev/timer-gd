@@ -252,7 +252,8 @@ button:hover {
   justify-content: center;
 }
 
-.edit-subheader input {
+.edit-subheader input,
+.subheadcontainer input {
   padding: 0.4rem 0.6rem;
   font-size: 1rem;
   border-radius: 6px;
