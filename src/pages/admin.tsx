@@ -36,40 +36,49 @@ export default function Admin() {
     const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
-        // Подключение к WebSocket-серверу
-        const websocket = new WebSocket(`ws://${location.hostname}:8080`);
+        // Подключение к WebSocket-серверу с автопереподключением
+        let websocket: WebSocket;
+        let reconnectTimer: ReturnType<typeof setTimeout>;
+        let unmounted = false;
 
-        websocket.onopen = () => {
-            console.log('Подключено к WebSocket-серверу');
+        const connect = () => {
+            websocket = new WebSocket(`ws://${location.hostname}:8080`);
+
+            websocket.onopen = () => {
+                console.log('Подключено к WebSocket-серверу');
+            };
+
+            websocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log(data);
+                if (data.type === 'timer') {
+                    setTimer(data.value);
+                } else if (data.type === 'title') {
+                    setTitle(data.value);
+                } else if (data.type === 'subHeader') {
+                    setSubHeader(data.value);
+                } else if (data.type === 'status') {
+                    setIsRunning(!data.value);
+                }
+            };
+
+            websocket.onclose = () => {
+                console.log('Отключено от WebSocket-сервера');
+                // При переподключении сервер пришлёт актуальное состояние
+                if (!unmounted) {
+                    reconnectTimer = setTimeout(connect, 2000);
+                }
+            };
+
+            setWs(websocket);
         };
 
-        websocket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log(data);
-            if (data.type === 'timer') {
-                setTimer(data.value);
-            } else if (data.type === 'title') {
-                setTitle(data.value);
-            } else if (data.type === 'subHeader') {
-                setSubHeader(data.value);
-            } else if (data.type === 'status') {
-                setIsRunning(!data.value);
-            }
-            // if (data.type === 'timer') {
-            //     setTimer(data.value); // Обновляем состояние таймера
-            // } else if (data.type === 'subHeader') {
-            //     setSubHeader(data.value)
-            // }
-        };
-
-        websocket.onclose = () => {
-            console.log('Отключено от WebSocket-сервера');
-        };
-
-        setWs(websocket);
+        connect();
 
         // Очистка при размонтировании компонента
         return () => {
+            unmounted = true;
+            clearTimeout(reconnectTimer);
             websocket.close();
         };
     }, []);
